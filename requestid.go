@@ -72,12 +72,12 @@ func (w *wrapper) Stream(ctx context.Context, req client.Request, opts ...client
 	return w.Client.Stream(ctx, req, opts...)
 }
 
-func (w *wrapper) Publish(ctx context.Context, p client.Message, opts ...client.PublishOption) error {
+func (w *wrapper) Publish(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
 	var err error
 	if ctx, err = MetadataFunc(ctx); err != nil {
 		return err
 	}
-	return w.Client.Publish(ctx, p, opts...)
+	return w.Client.Publish(ctx, msg, opts...)
 }
 
 func NewServerHandlerWrapper() server.HandlerWrapper {
