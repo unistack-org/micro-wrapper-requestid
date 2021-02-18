@@ -18,15 +18,19 @@ var (
 var (
 	// MetadataFunc wil be used if user not provide own func to fill metadata
 	MetadataFunc = func(ctx context.Context) (context.Context, error) {
-		_, ok := metadata.Get(ctx, MetadataKey)
+		md, ok := metadata.FromIncomingContext(ctx)
 		if ok {
-			return ctx, nil
+			if _, ok = md.Get(MetadataKey); ok {
+				return ctx, nil
+			}
 		}
+		md = metadata.New(1)
 		id, err := uuid.NewRandom()
 		if err != nil {
 			return ctx, err
 		}
-		ctx = metadata.Set(ctx, MetadataKey, id.String())
+		md.Set(MetadataKey, id.String())
+		ctx = metadata.NewIncomingContext(ctx, md)
 		return ctx, nil
 	}
 )
@@ -96,8 +100,13 @@ func NewServerSubscriberWrapper() server.SubscriberWrapper {
 	return func(fn server.SubscriberFunc) server.SubscriberFunc {
 		return func(ctx context.Context, msg server.Message) error {
 			var err error
+			md, ok := metadata.FromIncomingContext(ctx)
+			if !ok {
+				md = metadata.New(1)
+			}
 			if id, ok := msg.Header()[MetadataKey]; ok {
-				ctx = metadata.Set(ctx, MetadataKey, id)
+				md.Set(MetadataKey, id)
+				ctx = metadata.NewIncomingContext(ctx, md)
 			} else if ctx, err = MetadataFunc(ctx); err != nil {
 				return err
 			}
