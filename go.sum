@@ -7,6 +7,7 @@ github.com/google/uuid v1.2.0 h1:qJYtXnJRWmpe7m/3XlyhrsLrEURqHRM2kxzoxXqyUDs=
 github.com/google/uuid v1.2.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/heimdalr/dag v1.0.1/go.mod h1:t+ZkR+sjKL4xhlE1B9rwpvwfo+x+2R0363efS+Oghns=
 github.com/imdario/mergo v0.3.11/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
+github.com/imdario/mergo v0.3.12/go.mod h1:jmQim1M+e3UYxmgPu/WyfjB3N3VflVyUjjjwH0dnCYA=
 github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
@@ -26,6 +27,8 @@ github.com/unistack-org/micro/v3 v3.2.18 h1:+EnZ6xJJzHINQr7c8nkwygkfy+qLssiKd1hk
 github.com/unistack-org/micro/v3 v3.2.18/go.mod h1:y+fV+BPNK2IqGoLquRU396jTYifG0HCw3zxFfI4E0dc=
 github.com/unistack-org/micro/v3 v3.2.20 h1:EY94FDfHR43QvKNjmCaVH8/7+D8bmLwySXbFK9iIQY0=
 github.com/unistack-org/micro/v3 v3.2.20/go.mod h1:y+fV+BPNK2IqGoLquRU396jTYifG0HCw3zxFfI4E0dc=
+github.com/unistack-org/micro/v3 v3.2.22 h1:AXyLtRpfcPGczhaA1f9KR0ctK+1Zpqvb+rBJrZtp3Oo=
+github.com/unistack-org/micro/v3 v3.2.22/go.mod h1:oI8H/uGq1h4i5cvUycEoFKJQC7G8yChZQNIDNWGSLRU=
 golang.org/x/net v0.0.0-20210119194325-5f4716e94777/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/net v0.0.0-20210226172049-e18ecbb05110/go.mod h1:m0MpNAwzfU5UDzcl9v0D8zg8gWTRqZa9RBIspLL5mdg=
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
