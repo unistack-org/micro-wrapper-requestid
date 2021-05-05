@@ -19,12 +19,12 @@ var (
 	// MetadataFunc wil be used if user not provide own func to fill metadata
 	MetadataFunc = func(ctx context.Context) (context.Context, error) {
 		md, ok := metadata.FromIncomingContext(ctx)
-		if ok {
-			if _, ok = md.Get(MetadataKey); ok {
-				return ctx, nil
-			}
+		if !ok {
+			md = metadata.New(1)
 		}
-		md = metadata.New(1)
+		if _, ok = md.Get(MetadataKey); ok {
+			return ctx, nil
+		}
 		id, err := uuid.NewRandom()
 		if err != nil {
 			return ctx, err
