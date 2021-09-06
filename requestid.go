@@ -4,36 +4,32 @@ import (
 	"context"
 	"net/textproto"
 
-	"github.com/google/uuid"
 	"github.com/unistack-org/micro/v3/client"
 	"github.com/unistack-org/micro/v3/metadata"
 	"github.com/unistack-org/micro/v3/server"
+	"github.com/unistack-org/micro/v3/util/id"
 )
 
-var (
-	// MetadataKey contains metadata key
-	MetadataKey = textproto.CanonicalMIMEHeaderKey("x-request-id")
-)
+// MetadataKey contains metadata key
+var MetadataKey = textproto.CanonicalMIMEHeaderKey("x-request-id")
 
-var (
-	// MetadataFunc wil be used if user not provide own func to fill metadata
-	MetadataFunc = func(ctx context.Context) (context.Context, error) {
-		md, ok := metadata.FromIncomingContext(ctx)
-		if !ok {
-			md = metadata.New(1)
-		}
-		if _, ok = md.Get(MetadataKey); ok {
-			return ctx, nil
-		}
-		id, err := uuid.NewRandom()
-		if err != nil {
-			return ctx, err
-		}
-		md.Set(MetadataKey, id.String())
-		ctx = metadata.NewIncomingContext(ctx, md)
+// MetadataFunc wil be used if user not provide own func to fill metadata
+var MetadataFunc = func(ctx context.Context) (context.Context, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		md = metadata.New(1)
+	}
+	if _, ok = md.Get(MetadataKey); ok {
 		return ctx, nil
 	}
-)
+	uid, err := id.New()
+	if err != nil {
+		return ctx, err
+	}
+	md.Set(MetadataKey, uid)
+	ctx = metadata.NewIncomingContext(ctx, md)
+	return ctx, nil
+}
 
 type wrapper struct {
 	client.Client
