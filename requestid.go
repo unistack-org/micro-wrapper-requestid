@@ -1,13 +1,13 @@
-package requestid
+package requestid // import "go.unistack.org/micro-wrapper-requestid/v3"
 
 import (
 	"context"
 	"net/textproto"
 
-	"github.com/unistack-org/micro/v3/client"
-	"github.com/unistack-org/micro/v3/metadata"
-	"github.com/unistack-org/micro/v3/server"
-	"github.com/unistack-org/micro/v3/util/id"
+	"go.unistack.org/micro/v3/client"
+	"go.unistack.org/micro/v3/metadata"
+	"go.unistack.org/micro/v3/server"
+	"go.unistack.org/micro/v3/util/id"
 )
 
 // MetadataKey contains metadata key
