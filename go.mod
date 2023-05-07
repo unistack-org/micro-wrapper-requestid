@@ -1,5 +1,5 @@
-module go.unistack.org/micro-wrapper-requestid/v3
+module go.unistack.org/micro-wrapper-requestid/v4
 
-go 1.16
+go 1.20
 
-require go.unistack.org/micro/v3 v3.10.19
+require go.unistack.org/micro/v4 v4.0.1
