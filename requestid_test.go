@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"go.unistack.org/micro/v3/metadata"
+	"go.unistack.org/micro/v4/metadata"
 )
 
 func TestDefaultMetadataFunc(t *testing.T) {

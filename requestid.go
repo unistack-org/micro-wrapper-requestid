@@ -1,16 +1,16 @@
-package requestid // import "go.unistack.org/micro-wrapper-requestid/v3"
+package requestid // import "go.unistack.org/micro-wrapper-requestid/v4"
 
 import (
 	"context"
 	"net/textproto"
 
-	"go.unistack.org/micro/v3/client"
-	"go.unistack.org/micro/v3/metadata"
-	"go.unistack.org/micro/v3/server"
-	"go.unistack.org/micro/v3/util/id"
+	"go.unistack.org/micro/v4/client"
+	"go.unistack.org/micro/v4/metadata"
+	"go.unistack.org/micro/v4/server"
+	"go.unistack.org/micro/v4/util/id"
 )
 
-// DefaultMetadataKey contains metadata key
+// DefaultMetadataKey contains metadata key x-request-id
 var DefaultMetadataKey = textproto.CanonicalMIMEHeaderKey("x-request-id")
 
 // DefaultMetadataFunc wil be used if user not provide own func to fill metadata
