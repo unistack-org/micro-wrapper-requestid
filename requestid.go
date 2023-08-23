@@ -10,6 +10,8 @@ import (
 	"go.unistack.org/micro/v4/util/id"
 )
 
+var XRequestIDKey struct{}
+
 // DefaultMetadataKey contains metadata key x-request-id
 var DefaultMetadataKey = textproto.CanonicalMIMEHeaderKey("x-request-id")
 
@@ -38,6 +40,7 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 	}
 	imd.Set(DefaultMetadataKey, v)
 	omd.Set(DefaultMetadataKey, v)
+	ctx = context.WithValue(ctx, XRequestIDKey, v)
 	ctx = metadata.NewIncomingContext(ctx, imd)
 	ctx = metadata.NewOutgoingContext(ctx, omd)
 	return ctx, nil
