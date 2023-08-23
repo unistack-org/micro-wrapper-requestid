@@ -40,10 +40,11 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 	}
 	imd.Set(DefaultMetadataKey, v)
 	omd.Set(DefaultMetadataKey, v)
+	ctx = context.WithValue(ctx, XRequestIDKey, v)
 	ctx = metadata.NewIncomingContext(ctx, imd)
 	ctx = metadata.NewOutgoingContext(ctx, omd)
 
-	return context.WithValue(ctx, XRequestIDKey, v), nil
+	return ctx, nil
 }
 
 type wrapper struct {
