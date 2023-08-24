@@ -122,6 +122,7 @@ func NewServerSubscriberWrapper() server.SubscriberWrapper {
 			if id, ok := msg.Header()[DefaultMetadataKey]; ok {
 				imd.Set(DefaultMetadataKey, id)
 				omd.Set(DefaultMetadataKey, id)
+				ctx = context.WithValue(ctx, XRequestIDKey, id)
 				ctx = metadata.NewIncomingContext(ctx, imd)
 				ctx = metadata.NewOutgoingContext(ctx, omd)
 			} else if ctx, err = DefaultMetadataFunc(ctx); err != nil {
