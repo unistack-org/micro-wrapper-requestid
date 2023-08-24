@@ -17,32 +17,44 @@ var DefaultMetadataKey = textproto.CanonicalMIMEHeaderKey("x-request-id")
 
 // DefaultMetadataFunc wil be used if user not provide own func to fill metadata
 var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
-	imd, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		imd = metadata.New(1)
-	}
-	omd, ok := metadata.FromOutgoingContext(ctx)
-	if !ok {
-		omd = metadata.New(1)
-	}
-	v, iok := imd.Get(DefaultMetadataKey)
-	if iok {
-		if _, ook := omd.Get(DefaultMetadataKey); ook {
-			return ctx, nil
-		}
-	}
-	if !iok {
-		uid, err := id.New()
+	var xid string
+	var err error
+	var ook, iok bool
+
+	if _, ok := ctx.Value(XRequestIDKey).(string); !ok {
+		xid, err = id.New()
 		if err != nil {
 			return ctx, err
 		}
-		v = uid
+		ctx = context.WithValue(ctx, XRequestIDKey, xid)
 	}
-	imd.Set(DefaultMetadataKey, v)
-	omd.Set(DefaultMetadataKey, v)
-	ctx = context.WithValue(ctx, XRequestIDKey, v)
-	ctx = metadata.NewIncomingContext(ctx, imd)
-	ctx = metadata.NewOutgoingContext(ctx, omd)
+
+	imd, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		imd = metadata.New(1)
+		imd.Set(DefaultMetadataKey, xid)
+	} else if _, ok = imd.Get(DefaultMetadataKey); !ok {
+		imd.Set(DefaultMetadataKey, xid)
+	} else {
+		iok = true
+	}
+
+	omd, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		omd = metadata.New(1)
+		omd.Set(DefaultMetadataKey, xid)
+	} else if _, ok = omd.Get(DefaultMetadataKey); !ok {
+		omd.Set(DefaultMetadataKey, xid)
+	} else {
+		ook = true
+	}
+
+	if !iok {
+		ctx = metadata.NewIncomingContext(ctx, imd)
+	}
+	if !ook {
+		ctx = metadata.NewOutgoingContext(ctx, omd)
+	}
 
 	return ctx, nil
 }
