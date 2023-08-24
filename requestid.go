@@ -6,6 +6,7 @@ import (
 
 	"go.unistack.org/micro/v4/client"
 	"go.unistack.org/micro/v4/metadata"
+	"go.unistack.org/micro/v4/options"
 	"go.unistack.org/micro/v4/server"
 	"go.unistack.org/micro/v4/util/id"
 )
@@ -17,32 +18,45 @@ var DefaultMetadataKey = textproto.CanonicalMIMEHeaderKey("x-request-id")
 
 // DefaultMetadataFunc wil be used if user not provide own func to fill metadata
 var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
-	imd, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		imd = metadata.New(1)
-	}
-	omd, ok := metadata.FromOutgoingContext(ctx)
-	if !ok {
-		omd = metadata.New(1)
-	}
-	v, iok := imd.Get(DefaultMetadataKey)
-	if iok {
-		if _, ook := omd.Get(DefaultMetadataKey); ook {
-			return ctx, nil
-		}
-	}
-	if !iok {
-		uid, err := id.New()
+	var xid string
+	var err error
+	var ook, iok bool
+
+	if _, ok := ctx.Value(XRequestIDKey).(string); !ok {
+		xid, err = id.New()
 		if err != nil {
 			return ctx, err
 		}
-		v = uid
+		ctx = context.WithValue(ctx, XRequestIDKey, xid)
 	}
-	imd.Set(DefaultMetadataKey, v)
-	omd.Set(DefaultMetadataKey, v)
-	ctx = context.WithValue(ctx, XRequestIDKey, v)
-	ctx = metadata.NewIncomingContext(ctx, imd)
-	ctx = metadata.NewOutgoingContext(ctx, omd)
+
+	imd, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		imd = metadata.New(1)
+		imd.Set(DefaultMetadataKey, xid)
+	} else if _, ok = imd.Get(DefaultMetadataKey); !ok {
+		imd.Set(DefaultMetadataKey, xid)
+	} else {
+		iok = true
+	}
+
+	omd, ok := metadata.FromOutgoingContext(ctx)
+	if !ok {
+		omd = metadata.New(1)
+		omd.Set(DefaultMetadataKey, xid)
+	} else if _, ok = omd.Get(DefaultMetadataKey); !ok {
+		omd.Set(DefaultMetadataKey, xid)
+	} else {
+		ook = true
+	}
+
+	if !iok {
+		ctx = metadata.NewIncomingContext(ctx, imd)
+	}
+	if !ook {
+		ctx = metadata.NewOutgoingContext(ctx, omd)
+	}
+
 	return ctx, nil
 }
 
@@ -71,7 +85,7 @@ func NewClientCallWrapper() client.CallWrapper {
 	}
 }
 
-func (w *wrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
+func (w *wrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...options.Option) error {
 	var err error
 	if ctx, err = DefaultMetadataFunc(ctx); err != nil {
 		return err
@@ -79,20 +93,12 @@ func (w *wrapper) Call(ctx context.Context, req client.Request, rsp interface{},
 	return w.Client.Call(ctx, req, rsp, opts...)
 }
 
-func (w *wrapper) Stream(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
+func (w *wrapper) Stream(ctx context.Context, req client.Request, opts ...options.Option) (client.Stream, error) {
 	var err error
 	if ctx, err = DefaultMetadataFunc(ctx); err != nil {
 		return nil, err
 	}
 	return w.Client.Stream(ctx, req, opts...)
-}
-
-func (w *wrapper) Publish(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
-	var err error
-	if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-		return err
-	}
-	return w.Client.Publish(ctx, msg, opts...)
 }
 
 func NewServerHandlerWrapper() server.HandlerWrapper {
@@ -103,32 +109,6 @@ func NewServerHandlerWrapper() server.HandlerWrapper {
 				return err
 			}
 			return fn(ctx, req, rsp)
-		}
-	}
-}
-
-func NewServerSubscriberWrapper() server.SubscriberWrapper {
-	return func(fn server.SubscriberFunc) server.SubscriberFunc {
-		return func(ctx context.Context, msg server.Message) error {
-			var err error
-			imd, ok := metadata.FromIncomingContext(ctx)
-			if !ok {
-				imd = metadata.New(1)
-			}
-			omd, ok := metadata.FromOutgoingContext(ctx)
-			if !ok {
-				omd = metadata.New(1)
-			}
-			if id, ok := msg.Header()[DefaultMetadataKey]; ok {
-				imd.Set(DefaultMetadataKey, id)
-				omd.Set(DefaultMetadataKey, id)
-				ctx = context.WithValue(ctx, XRequestIDKey, id)
-				ctx = metadata.NewIncomingContext(ctx, imd)
-				ctx = metadata.NewOutgoingContext(ctx, omd)
-			} else if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-				return err
-			}
-			return fn(ctx, msg)
 		}
 	}
 }
