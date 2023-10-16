@@ -1,4 +1,4 @@
-go.unistack.org/micro/v4 v4.0.1 h1:xo1IxbVfgh8i0eY0VeYa3cbb13u5n/Mxnp3FOgWD4Jo=
-go.unistack.org/micro/v4 v4.0.1/go.mod h1:p/J5UcSJjfHsWGT31uKoghQ5rUQZzQJBAFy+Z4+ZVMs=
-go.unistack.org/micro/v4 v4.0.7 h1:2lwtZlHcSwgkahhFbkI4x1lOS79lw8uLHtcEhlFF+AM=
-go.unistack.org/micro/v4 v4.0.7/go.mod h1:bVEYTlPi0EsdgZZt311bIroDg9ict7ky3C87dSCCAGk=
+go.unistack.org/micro/v4 v4.0.14 h1:zN+aVfTceei3TPzuA7f2wAXLYHoSHWpx2XgW8yqaTIA=
+go.unistack.org/micro/v4 v4.0.14/go.mod h1:ZDgU9931vm2l7X6RN/6UuwRIVp24GRdmQ7dKmegArk4=
+golang.org/x/exp v0.0.0-20231006140011-7918f672742d h1:jtJma62tbqLibJ5sFQz8bKtEM8rJBtfilJ2qTU199MI=
+golang.org/x/exp v0.0.0-20231006140011-7918f672742d/go.mod h1:ldy0pHrwJyGW56pPQzzkH36rKxoZW1tw7ZJpeKx+hdo=

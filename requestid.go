@@ -5,11 +5,21 @@ import (
 	"net/textproto"
 
 	"go.unistack.org/micro/v4/client"
+	"go.unistack.org/micro/v4/logger"
 	"go.unistack.org/micro/v4/metadata"
 	"go.unistack.org/micro/v4/options"
 	"go.unistack.org/micro/v4/server"
 	"go.unistack.org/micro/v4/util/id"
 )
+
+func init() {
+	logger.DefaultContextAttrFuncs = append(logger.DefaultContextAttrFuncs, func(ctx context.Context) []interface{} {
+		if v, ok := ctx.Value(XRequestIDKey).(string); ok {
+			return []interface{}{DefaultMetadataKey, v}
+		}
+		return nil
+	})
+}
 
 var XRequestIDKey struct{}
 
