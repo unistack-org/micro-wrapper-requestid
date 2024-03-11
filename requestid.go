@@ -3,6 +3,7 @@ package requestid
 import (
 	"context"
 	"net/textproto"
+	"strings"
 
 	"go.unistack.org/micro/v4/client"
 	"go.unistack.org/micro/v4/logger"
@@ -13,9 +14,10 @@ import (
 )
 
 func init() {
+	requestIDLog := strings.ToLower(DefaultMetadataKey)
 	logger.DefaultContextAttrFuncs = append(logger.DefaultContextAttrFuncs, func(ctx context.Context) []interface{} {
 		if v, ok := ctx.Value(XRequestIDKey{}).(string); ok {
-			return []interface{}{DefaultMetadataKey, v}
+			return []interface{}{requestIDLog, v}
 		}
 		return nil
 	})
@@ -52,7 +54,7 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 	if !ok {
 		omd = metadata.New(1)
 		omd.Set(DefaultMetadataKey, xid)
-		ctx = metadata.NewOutgoingContext(ctx, imd)
+		ctx = metadata.NewOutgoingContext(ctx, omd)
 	} else if _, ok = omd.Get(DefaultMetadataKey); !ok {
 		omd.Set(DefaultMetadataKey, xid)
 	}
