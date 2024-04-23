@@ -81,78 +81,69 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-type wrapper struct {
-	client.Client
-}
+type Hook struct{}
 
-func NewClientWrapper() client.Wrapper {
-	return func(c client.Client) client.Client {
-		handler := &wrapper{
-			Client: c,
+var Wrapper = &Hook{}
+
+func (w *Hook) ServerSubscriber(next server.FuncSubHandler) server.FuncSubHandler {
+	return func(ctx context.Context, msg server.Message) error {
+		var err error
+		if xid, ok := msg.Header()[DefaultMetadataKey]; ok {
+			ctx = context.WithValue(ctx, XRequestIDKey{}, xid)
 		}
-		return handler
-	}
-}
-
-func NewClientCallWrapper() client.CallWrapper {
-	return func(fn client.CallFunc) client.CallFunc {
-		return func(ctx context.Context, addr string, req client.Request, rsp interface{}, opts client.CallOptions) error {
-			var err error
-			if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-				return err
-			}
-			return fn(ctx, addr, req, rsp, opts)
+		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
+			return err
 		}
+		return next(ctx, msg)
 	}
 }
 
-func (w *wrapper) Call(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
-	var err error
-	if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-		return err
-	}
-	return w.Client.Call(ctx, req, rsp, opts...)
-}
-
-func (w *wrapper) Stream(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
-	var err error
-	if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-		return nil, err
-	}
-	return w.Client.Stream(ctx, req, opts...)
-}
-
-func (w *wrapper) Publish(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
-	var err error
-	if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-		return err
-	}
-	return w.Client.Publish(ctx, msg, opts...)
-}
-
-func NewServerHandlerWrapper() server.HandlerWrapper {
-	return func(fn server.HandlerFunc) server.HandlerFunc {
-		return func(ctx context.Context, req server.Request, rsp interface{}) error {
-			var err error
-			if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-				return err
-			}
-			return fn(ctx, req, rsp)
+func (w *Hook) ServerHandler(next server.FuncHandler) server.FuncHandler {
+	return func(ctx context.Context, req server.Request, rsp interface{}) error {
+		var err error
+		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
+			return err
 		}
+		return next(ctx, req, rsp)
 	}
 }
 
-func NewServerSubscriberWrapper() server.SubscriberWrapper {
-	return func(fn server.SubscriberFunc) server.SubscriberFunc {
-		return func(ctx context.Context, msg server.Message) error {
-			var err error
-			if xid, ok := msg.Header()[DefaultMetadataKey]; ok {
-				ctx = context.WithValue(ctx, XRequestIDKey{}, xid)
-			}
-			if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-				return err
-			}
-			return fn(ctx, msg)
+func (w *Hook) ClientBatchPublish(next client.FuncBatchPublish) client.FuncBatchPublish {
+	return func(ctx context.Context, msgs []client.Message, opts ...client.PublishOption) error {
+		var err error
+		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
+			return err
 		}
+		return next(ctx, msgs, opts...)
+	}
+}
+
+func (w *Hook) ClientPublish(next client.FuncPublish) client.FuncPublish {
+	return func(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
+		var err error
+		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
+			return err
+		}
+		return next(ctx, msg, opts...)
+	}
+}
+
+func (w *Hook) ClientCall(next client.FuncCall) client.FuncCall {
+	return func(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
+		var err error
+		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
+			return err
+		}
+		return next(ctx, req, rsp, opts...)
+	}
+}
+
+func (w *Hook) ClientStream(next client.FuncStream) client.FuncStream {
+	return func(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
+		var err error
+		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
+			return nil, err
+		}
+		return next(ctx, req, opts...)
 	}
 }
