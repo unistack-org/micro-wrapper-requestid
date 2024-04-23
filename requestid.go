@@ -81,11 +81,11 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 	return ctx, nil
 }
 
-type Hook struct{}
+type hook struct{}
 
-var Wrapper = &Hook{}
+var Hook = &hook{}
 
-func (w *Hook) ServerSubscriber(next server.FuncSubHandler) server.FuncSubHandler {
+func (w *hook) ServerSubscriber(next server.FuncSubHandler) server.FuncSubHandler {
 	return func(ctx context.Context, msg server.Message) error {
 		var err error
 		if xid, ok := msg.Header()[DefaultMetadataKey]; ok {
@@ -98,7 +98,7 @@ func (w *Hook) ServerSubscriber(next server.FuncSubHandler) server.FuncSubHandle
 	}
 }
 
-func (w *Hook) ServerHandler(next server.FuncHandler) server.FuncHandler {
+func (w *hook) ServerHandler(next server.FuncHandler) server.FuncHandler {
 	return func(ctx context.Context, req server.Request, rsp interface{}) error {
 		var err error
 		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
@@ -108,7 +108,7 @@ func (w *Hook) ServerHandler(next server.FuncHandler) server.FuncHandler {
 	}
 }
 
-func (w *Hook) ClientBatchPublish(next client.FuncBatchPublish) client.FuncBatchPublish {
+func (w *hook) ClientBatchPublish(next client.FuncBatchPublish) client.FuncBatchPublish {
 	return func(ctx context.Context, msgs []client.Message, opts ...client.PublishOption) error {
 		var err error
 		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
@@ -118,7 +118,7 @@ func (w *Hook) ClientBatchPublish(next client.FuncBatchPublish) client.FuncBatch
 	}
 }
 
-func (w *Hook) ClientPublish(next client.FuncPublish) client.FuncPublish {
+func (w *hook) ClientPublish(next client.FuncPublish) client.FuncPublish {
 	return func(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
 		var err error
 		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
@@ -128,7 +128,7 @@ func (w *Hook) ClientPublish(next client.FuncPublish) client.FuncPublish {
 	}
 }
 
-func (w *Hook) ClientCall(next client.FuncCall) client.FuncCall {
+func (w *hook) ClientCall(next client.FuncCall) client.FuncCall {
 	return func(ctx context.Context, req client.Request, rsp interface{}, opts ...client.CallOption) error {
 		var err error
 		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
@@ -138,7 +138,7 @@ func (w *Hook) ClientCall(next client.FuncCall) client.FuncCall {
 	}
 }
 
-func (w *Hook) ClientStream(next client.FuncStream) client.FuncStream {
+func (w *hook) ClientStream(next client.FuncStream) client.FuncStream {
 	return func(ctx context.Context, req client.Request, opts ...client.CallOption) (client.Stream, error) {
 		var err error
 		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
