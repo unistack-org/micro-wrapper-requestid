@@ -83,7 +83,9 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 
 type hook struct{}
 
-var Hook = &hook{}
+func NewHook() *hook {
+	return &hook{}
+}
 
 func (w *hook) ServerSubscriber(next server.FuncSubHandler) server.FuncSubHandler {
 	return func(ctx context.Context, msg server.Message) error {
