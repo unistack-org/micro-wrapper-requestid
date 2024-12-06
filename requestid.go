@@ -2,25 +2,12 @@ package requestid // import "go.unistack.org/micro-wrapper-requestid/v3"
 
 import (
 	"context"
-	"net/textproto"
-	"strings"
-
 	"go.unistack.org/micro/v3/client"
-	"go.unistack.org/micro/v3/logger"
 	"go.unistack.org/micro/v3/metadata"
 	"go.unistack.org/micro/v3/server"
 	"go.unistack.org/micro/v3/util/id"
+	"net/textproto"
 )
-
-func init() {
-	requestIDLog := strings.ToLower(DefaultMetadataKey)
-	logger.DefaultContextAttrFuncs = append(logger.DefaultContextAttrFuncs, func(ctx context.Context) []interface{} {
-		if v, ok := ctx.Value(XRequestIDKey{}).(string); ok {
-			return []interface{}{requestIDLog, v}
-		}
-		return nil
-	})
-}
 
 type XRequestIDKey struct{}
 

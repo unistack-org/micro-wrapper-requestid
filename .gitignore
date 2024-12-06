@@ -1,9 +1,21 @@
+# Develop tools
+/.vscode/
+/.idea/
+.idea
+.vscode
+
 # Binaries for programs and plugins
 *.exe
 *.exe~
 *.dll
 *.so
 *.dylib
+
+# Folders
+_obj
+_test
+_build
+.DS_Store
 
 # Test binary, built with `go test -c`
 *.test
