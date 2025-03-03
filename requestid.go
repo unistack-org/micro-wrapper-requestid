@@ -1,12 +1,13 @@
-package requestid // import "go.unistack.org/micro-wrapper-requestid/v3"
+package requestid
 
 import (
 	"context"
-	"go.unistack.org/micro/v3/client"
-	"go.unistack.org/micro/v3/metadata"
-	"go.unistack.org/micro/v3/server"
-	"go.unistack.org/micro/v3/util/id"
 	"net/textproto"
+
+	"go.unistack.org/micro/v4/client"
+	"go.unistack.org/micro/v4/metadata"
+	"go.unistack.org/micro/v4/server"
+	"go.unistack.org/micro/v4/util/id"
 )
 
 type XRequestIDKey struct{}
@@ -36,12 +37,20 @@ var DefaultMetadataFunc = func(ctx context.Context) (context.Context, error) {
 	}
 
 	if xid == "" {
-		var id string
-		if id, iok = imd.Get(DefaultMetadataKey); iok && id != "" {
-			xid = id
+		var ids []string
+		if ids, iok = imd.Get(DefaultMetadataKey); iok {
+			for i := range ids {
+				if ids[i] != "" {
+					xid = ids[i]
+				}
+			}
 		}
-		if id, ook = omd.Get(DefaultMetadataKey); ook && id != "" {
-			xid = id
+		if ids, ook = omd.Get(DefaultMetadataKey); ook {
+			for i := range ids {
+				if ids[i] != "" {
+					xid = ids[i]
+				}
+			}
 		}
 	}
 
@@ -74,19 +83,6 @@ func NewHook() *hook {
 	return &hook{}
 }
 
-func (w *hook) ServerSubscriber(next server.FuncSubHandler) server.FuncSubHandler {
-	return func(ctx context.Context, msg server.Message) error {
-		var err error
-		if xid, ok := msg.Header()[DefaultMetadataKey]; ok {
-			ctx = context.WithValue(ctx, XRequestIDKey{}, xid)
-		}
-		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-			return err
-		}
-		return next(ctx, msg)
-	}
-}
-
 func (w *hook) ServerHandler(next server.FuncHandler) server.FuncHandler {
 	return func(ctx context.Context, req server.Request, rsp interface{}) error {
 		var err error
@@ -94,26 +90,6 @@ func (w *hook) ServerHandler(next server.FuncHandler) server.FuncHandler {
 			return err
 		}
 		return next(ctx, req, rsp)
-	}
-}
-
-func (w *hook) ClientBatchPublish(next client.FuncBatchPublish) client.FuncBatchPublish {
-	return func(ctx context.Context, msgs []client.Message, opts ...client.PublishOption) error {
-		var err error
-		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-			return err
-		}
-		return next(ctx, msgs, opts...)
-	}
-}
-
-func (w *hook) ClientPublish(next client.FuncPublish) client.FuncPublish {
-	return func(ctx context.Context, msg client.Message, opts ...client.PublishOption) error {
-		var err error
-		if ctx, err = DefaultMetadataFunc(ctx); err != nil {
-			return err
-		}
-		return next(ctx, msg, opts...)
 	}
 }
 
